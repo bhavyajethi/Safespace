@@ -38,11 +38,23 @@ def find_therapists_locationwise(location: str):
 # from google import genai
 # from google.genai import types
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain.agents import create_agent
+from langgraph.prebuilt import create_react_agent
 
 tools = [ask_mental_health_professional, emergency_tool_calling, find_therapists_locationwise]
-llm = ChatGoogleGenerativeAI(model="gemini-2.5-pro", temperature=0.2, api_key=GEMINI_API_KEY)
-graph = create_agent(llm, tools=tools)
+from langchain_google_genai import ChatGoogleGenerativeAI, HarmBlockThreshold, HarmCategory
+
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash",
+    temperature=0.2,
+    api_key=GEMINI_API_KEY,
+    safety_settings={
+        HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
+        HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+        HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+        HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
+    }
+)
+graph = create_react_agent(llm, tools=tools)
 
 SYSTEM_PROMPT = """
 You are an AI engine supporting mental health conversations with warmth and vigilance.
@@ -67,11 +79,11 @@ def parse_response(stream):
                         final_response = msg.content
     return final_response
 
-if __name__ == "__main__":
+"""if __name__ == "__main__":
     while True:
         user_input = input("User: ")
         print("Received user input", {user_input[:200]})
         inputs = {"messages": [("system", SYSTEM_PROMPT), ("user", user_input)]}
         stream = graph.stream(inputs, stream_mode="updates")
         final_response = parse_response(stream)
-        print("answer:", final_response)
+        print("answer:", final_response)"""
