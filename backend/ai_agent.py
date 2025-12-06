@@ -1,7 +1,8 @@
 # 1) Create an AI agent and link to the backend
 from langchain_core.tools import tool
 from tools import query_medgemma, emergency_call
-from config import GEMINI_API_KEY
+from config import GROQ_API_KEY
+# from config import GEMINI_API_KEY
 
 @tool
 def ask_mental_health_professional(query: str) -> str:
@@ -37,23 +38,27 @@ def find_therapists_locationwise(location: str):
 # create an ai agent and link it to the backend 
 # from google import genai
 # from google.genai import types
+
+from langchain_groq import ChatGroq
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.prebuilt import create_react_agent
 
 tools = [ask_mental_health_professional, emergency_tool_calling, find_therapists_locationwise]
-from langchain_google_genai import ChatGoogleGenerativeAI, HarmBlockThreshold, HarmCategory
 
-llm = ChatGoogleGenerativeAI(
+"""llm = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash",
     temperature=0.2,
-    api_key=GEMINI_API_KEY,
-    safety_settings={
-        HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
-    }
-)
+    api_key=GROQ_API_KEY,
+    # safety_settings={
+    #     HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
+    #     HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+    #     HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+    #     HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
+    # }
+)"""
+
+llm = ChatGroq(model="openai/gpt-oss-120b", temperature=0.2, api_key=GROQ_API_KEY)
+
 graph = create_react_agent(llm, tools=tools)
 
 SYSTEM_PROMPT = """
